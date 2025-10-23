@@ -10,7 +10,7 @@ class Dictionary:
 
     def __setitem__(self, key: Any, value: Any) -> None:
         node: DictNode = Dictionary._make_node(key, value)
-        index: int = self._make_index(node.hash)
+        index: int = self._make_index(node.dict_hash)
         item: Optional[DictNode] = self._hash_table[index]
 
         if item:
@@ -40,7 +40,7 @@ class Dictionary:
     def _make_node(key: Any, value: Any) -> "DictNode":
         return DictNode(
             key=key,
-            hash=hash(key),
+            dict_hash=hash(key),
             value=value
         )
 
@@ -52,7 +52,7 @@ class Dictionary:
 
         for node in old_table:
             if node:
-                index: int = self._make_index(node.hash)
+                index: int = self._make_index(node.dict_hash)
                 while self._hash_table[index] is not None:
                     index = (index + 1) % len(self._hash_table)
                 self._hash_table[index] = node
@@ -73,10 +73,11 @@ class Dictionary:
         raise KeyError("Key not found")
 
     def _collision_handler(self, node: "DictNode") -> int:
-        index: int = self._make_index(node.hash)
+        index: int = self._make_index(node.dict_hash)
 
         while self._hash_table[index] is not None:
             if node.key == self._hash_table[index].key:
+                self._length -= 1
                 return index
             index = (index + 1) % len(self._hash_table)
 
@@ -86,5 +87,5 @@ class Dictionary:
 @dataclasses.dataclass
 class DictNode:
     key: Any
-    hash: int
+    dict_hash: int
     value: Any
