@@ -10,14 +10,12 @@ class Dictionary:
 
     def __setitem__(self, key: Any, value: Any) -> None:
         node: DictNode = Dictionary._make_node(key, value)
-        index: int = self._make_index(node.dict_hash)
-        item: Optional[DictNode] = self._hash_table[index]
+        index: int = self._collision_handler(node)
 
-        if item:
-            index = self._collision_handler(node)
+        if not self._hash_table[index]:
+            self._length += 1
 
         self._hash_table[index] = node
-        self._length += 1
 
         if self._length > self._trash_holder:
             self._resize_table()
@@ -77,7 +75,6 @@ class Dictionary:
 
         while self._hash_table[index] is not None:
             if node.key == self._hash_table[index].key:
-                self._length -= 1
                 return index
             index = (index + 1) % len(self._hash_table)
 
